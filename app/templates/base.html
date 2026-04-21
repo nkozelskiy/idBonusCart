@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Поиск бонусной карты{% endblock %}</title>
+
+  <!-- Bootstrap 5 CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Bootstrap Icons CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    rel="stylesheet"
+  />
+  <link href="/static/style.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+
+  <!-- Навигационная панель (только для авторизованных) -->
+  {% if username %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="/search">
+        <i class="bi bi-credit-card-2-front me-2"></i>Бонусные карты
+      </a>
+      <div class="d-flex align-items-center gap-2">
+        {% if role == "admin" %}
+        <a class="btn btn-outline-light btn-sm" href="/admin/upload">
+          <i class="bi bi-upload me-1"></i>Загрузка данных
+        </a>
+        {% endif %}
+        <span class="text-white-50 small">
+          <i class="bi bi-person-circle me-1"></i>{{ username }}
+          {% if role == "admin" %}
+            <span class="badge bg-warning text-dark ms-1">Администратор</span>
+          {% else %}
+            <span class="badge bg-light text-primary ms-1">Сотрудник</span>
+          {% endif %}
+        </span>
+        <a class="btn btn-outline-light btn-sm" href="/logout">
+          <i class="bi bi-box-arrow-right me-1"></i>Выйти
+        </a>
+      </div>
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- Основной контент -->
+  <main class="container py-4">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  ></script>
+</body>
+</html>

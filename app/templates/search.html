@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Поиск карты{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+
+    <h4 class="fw-semibold mb-4 text-center">
+      <i class="bi bi-search me-2 text-primary"></i>Найти бонусную карту
+    </h4>
+
+    <!-- Форма поиска -->
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <form method="post" action="/search" novalidate>
+
+          <!-- Валидационная ошибка (пустые поля) -->
+          {% if error %}
+          <div class="alert alert-warning py-2 mb-3">
+            <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label for="phone" class="form-label fw-medium">
+              <i class="bi bi-telephone me-1"></i>Номер телефона
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              class="form-control form-control-lg"
+              placeholder="+7 (999) 123-45-67"
+              value="{{ phone or '' }}"
+              autocomplete="tel"
+            />
+            <div class="form-text">Можно вводить в любом формате (+7, 8, пробелы)</div>
+          </div>
+
+          <div class="mb-4">
+            <label for="last_name" class="form-label fw-medium">
+              <i class="bi bi-person me-1"></i>Фамилия
+            </label>
+            <input
+              id="last_name"
+              name="last_name"
+              type="text"
+              class="form-control form-control-lg"
+              placeholder="Например: Иванов"
+              value="{{ last_name or '' }}"
+              autocomplete="family-name"
+            />
+            <div class="form-text">Частичное совпадение, регистр не важен</div>
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg fw-medium">
+              <i class="bi bi-search me-2"></i>Найти номер карты
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- Блок результатов (показывается только после поиска) -->
+    {% if searched %}
+
+      {% if results %}
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-success text-white fw-semibold">
+          <i class="bi bi-check-circle me-2"></i>
+          Найдено записей: {{ results | length }}
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3">Номер карты</th>
+                  <th>Фамилия</th>
+                  <th>Телефон</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for card in results %}
+                <tr>
+                  <td class="ps-3">
+                    <span class="badge bg-primary fs-6 fw-normal font-monospace">
+                      {{ card.card_number }}
+                    </span>
+                  </td>
+                  <td>{{ card.last_name }}</td>
+                  <td class="text-muted font-monospace">{{ card.phone_number }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {% else %}
+      <div class="alert alert-secondary border-0 shadow-sm text-center py-4">
+        <i class="bi bi-emoji-frown fs-2 text-muted d-block mb-2"></i>
+        <strong>Номер карты не найден.</strong><br />
+        Попробуйте ввести другой номер телефона или фамилию.
+      </div>
+      {% endif %}
+
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

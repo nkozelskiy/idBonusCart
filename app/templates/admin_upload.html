@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Загрузка данных — Администратор{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-6">
+
+    <h4 class="fw-semibold mb-1 text-center">
+      <i class="bi bi-cloud-upload me-2 text-primary"></i>Загрузка данных из Excel
+    </h4>
+    <p class="text-center text-muted small mb-4">Только файлы формата <code>.xlsx</code></p>
+
+    <!-- Уведомление об успехе -->
+    {% if success %}
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>{{ success }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Уведомление об ошибке -->
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+      <i class="bi bi-x-circle-fill me-2"></i>{{ error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Форма загрузки -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body p-4">
+        <form
+          method="post"
+          action="/admin/upload"
+          enctype="multipart/form-data"
+          novalidate
+        >
+          <div class="mb-4">
+            <label for="file" class="form-label fw-medium">Выберите файл Excel</label>
+            <input
+              id="file"
+              name="file"
+              type="file"
+              class="form-control form-control-lg"
+              accept=".xlsx"
+              required
+            />
+          </div>
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg fw-medium">
+              <i class="bi bi-upload me-2"></i>Загрузить в базу данных
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Подсказка по структуре файла -->
+    <div class="card border-0 shadow-sm bg-white">
+      <div class="card-header bg-light fw-semibold text-muted small">
+        <i class="bi bi-info-circle me-1"></i>Ожидаемая структура файла
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm mb-0 small">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">номер карты / card_number</th>
+                <th>фамилия / last_name</th>
+                <th>телефон / phone_number</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="ps-3 font-monospace">1234567890</td>
+                <td>Иванов</td>
+                <td>+7 999 123-45-67</td>
+              </tr>
+              <tr>
+                <td class="ps-3 font-monospace">9876543210</td>
+                <td>Петров</td>
+                <td>89001234567</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-light text-muted small">
+        Принимаются как русские, так и английские названия столбцов.<br/>
+        При повторной загрузке дубли по номеру карты или телефону обновляются автоматически.
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
