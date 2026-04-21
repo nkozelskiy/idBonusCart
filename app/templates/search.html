@@ -7,7 +7,7 @@
   <div class="col-12 col-md-8 col-lg-6">
 
     <h4 class="fw-semibold mb-4 text-center">
-      <i class="bi bi-search me-2 text-primary"></i>Найти бонусную карту
+      <i class="bi bi-search me-2 text-secondary"></i>Найти бонусную карту
     </h4>
 
     <!-- Форма поиска -->
@@ -15,13 +15,13 @@
       <div class="card-body p-4">
         <form method="post" action="/search" novalidate>
 
-          <!-- Валидационная ошибка (пустые поля) -->
           {% if error %}
           <div class="alert alert-warning py-2 mb-3">
             <i class="bi bi-exclamation-circle me-2"></i>{{ error }}
           </div>
           {% endif %}
 
+          <!-- Поле телефона с маской -->
           <div class="mb-3">
             <label for="phone" class="form-label fw-medium">
               <i class="bi bi-telephone me-1"></i>Номер телефона
@@ -30,14 +30,19 @@
               id="phone"
               name="phone"
               type="tel"
-              class="form-control form-control-lg"
-              placeholder="+7 (999) 123-45-67"
+              class="form-control form-control-lg font-monospace"
+              placeholder="+7 (___) _______"
               value="{{ phone or '' }}"
-              autocomplete="tel"
+              autocomplete="off"
+              maxlength="16"
             />
-            <div class="form-text">Можно вводить в любом формате (+7, 8, пробелы)</div>
+            <div class="form-text">
+              Формат: <code>+7 (XXX) XXXXXXX</code> — поиск по последним 7 цифрам,
+              частичный ввод тоже работает
+            </div>
           </div>
 
+          <!-- Поле фамилии -->
           <div class="mb-4">
             <label for="last_name" class="form-label fw-medium">
               <i class="bi bi-person me-1"></i>Фамилия
@@ -47,11 +52,14 @@
               name="last_name"
               type="text"
               class="form-control form-control-lg"
-              placeholder="Например: Иванов"
+              placeholder="Например: Иван или Иванов"
               value="{{ last_name or '' }}"
-              autocomplete="family-name"
+              autocomplete="off"
             />
-            <div class="form-text">Частичное совпадение, регистр не важен</div>
+            <div class="form-text">
+              Частичное совпадение, регистр не важен —
+              «<em>ник</em>» найдёт «Никита», «Никитин» и т.д.
+            </div>
           </div>
 
           <div class="d-grid">
@@ -64,7 +72,7 @@
       </div>
     </div>
 
-    <!-- Блок результатов (показывается только после поиска) -->
+    <!-- Результаты -->
     {% if searched %}
 
       {% if results %}
@@ -87,7 +95,8 @@
                 {% for card in results %}
                 <tr>
                   <td class="ps-3">
-                    <span class="badge bg-primary fs-6 fw-normal font-monospace">
+                    <span class="badge fs-6 fw-normal font-monospace"
+                          style="background:#495057;">
                       {{ card.card_number }}
                     </span>
                   </td>
@@ -113,4 +122,92 @@
 
   </div>
 </div>
+
+<!-- ══ Маска ввода телефона ══ -->
+<script>
+(function () {
+  const input = document.getElementById('phone');
+  if (!input) return;
+
+  const PREFIX = '+7 (';   // фиксированная часть
+  const MAX    = 10;       // 3 (код города) + 7 (номер)
+
+  /* Из любой строки достаём только цифры без кода страны */
+  function digits(val) {
+    let d = val.replace(/\D/g, '');
+    if (d.startsWith('7') || d.startsWith('8')) d = d.slice(1);
+    return d.slice(0, MAX);
+  }
+
+  /* Форматируем цифры в маску: +7 (XXX) XXXXXXX */
+  function format(d) {
+    let out = PREFIX;
+    if (d.length > 0) out += d.slice(0, 3);
+    if (d.length > 3) out += ') ' + d.slice(3, 10);
+    return out;
+  }
+
+  /* Позиция курсора в зависимости от числа введённых цифр */
+  function caretPos(d) {
+    if (d.length <= 3) return PREFIX.length + d.length;
+    return PREFIX.length + 3 + 2 + Math.min(d.length - 3, 7); // ') ' = 2 символа
+  }
+
+  /* Установить курсор */
+  function setCaret(pos) {
+    input.setSelectionRange(pos, pos);
+  }
+
+  /* Применить маску к текущему значению */
+  function applyMask() {
+    const d   = digits(input.value);
+    input.value = d.length ? format(d) : '';
+    setCaret(caretPos(d));
+  }
+
+  /* Инициализация: если значение уже есть (после поиска) — применить маску */
+  if (input.value.trim()) {
+    applyMask();
+  }
+
+  /* Фокус: если поле пустое, подставить префикс */
+  input.addEventListener('focus', function () {
+    if (!this.value) {
+      this.value = PREFIX;
+      setCaret(PREFIX.length);
+    }
+  });
+
+  /* Потеря фокуса: если остался только префикс — очистить */
+  input.addEventListener('blur', function () {
+    if (this.value === PREFIX || digits(this.value) === '') {
+      this.value = '';
+    }
+  });
+
+  /* Ввод символа */
+  input.addEventListener('input', applyMask);
+
+  /* Backspace / Delete: запретить удаление префикса */
+  input.addEventListener('keydown', function (e) {
+    const start = this.selectionStart;
+    const end   = this.selectionEnd;
+    if ((e.key === 'Backspace' || e.key === 'Delete')
+        && start === end && start <= PREFIX.length) {
+      e.preventDefault();
+    }
+  });
+
+  /* Вставка из буфера */
+  input.addEventListener('paste', function (e) {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData).getData('text');
+    let d = pasted.replace(/\D/g, '');
+    if (d.startsWith('7') || d.startsWith('8')) d = d.slice(1);
+    d = d.slice(0, MAX);
+    this.value = d.length ? format(d) : '';
+    setCaret(caretPos(d));
+  });
+})();
+</script>
 {% endblock %}

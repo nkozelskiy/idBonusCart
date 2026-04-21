@@ -1,3 +1,4 @@
+import re
 import logging
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -6,6 +7,12 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.services.search_service import search_cards
+
+
+def _clean_phone(raw: str) -> str:
+    """Возвращает пустую строку, если пользователь ввёл только маску без цифр."""
+    digits = re.sub(r'\D', '', raw).lstrip('78')
+    return raw.strip() if digits else ""
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -38,7 +45,7 @@ async def search_result(
     if not request.session.get("user_id"):
         return RedirectResponse(url="/login", status_code=302)
 
-    phone     = phone.strip()
+    phone     = _clean_phone(phone)
     last_name = last_name.strip()
     ctx       = _base_ctx(request)
     ctx.update({"phone": phone, "last_name": last_name, "searched": True})
