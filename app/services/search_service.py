@@ -63,9 +63,17 @@ def search_cards(
     if last_name:
         clean = last_name.strip()
         if clean:
-            # func.lower переопределён в database.py для поддержки кириллицы
+            clean_lower = clean.lower()
+            # func.lower переопределён в database.py для поддержки кириллицы.
+            # Двустороннее совпадение:
+            #   1) фамилия содержит запрос: «ник»     → находит «Никита», «Никитин»
+            #   2) запрос содержит фамилию: «Никита»  → находит «Ник», «Никит»
+            # func.instr(строка, подстрока) > 0  эквивалентно  INSTR(строка, подстрока) > 0
             filters.append(
-                func.lower(BonusCard.last_name).contains(clean.lower())
+                or_(
+                    func.lower(BonusCard.last_name).contains(clean_lower),
+                    func.instr(clean_lower, func.lower(BonusCard.last_name)) > 0,
+                )
             )
 
     if not filters:
