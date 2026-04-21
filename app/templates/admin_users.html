@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Сотрудники — ECOO KZ{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-9">
+
+    <h4 class="fw-semibold mb-1 text-center">
+      <i class="bi bi-people me-2 text-secondary"></i>Управление сотрудниками
+    </h4>
+    <p class="text-center text-muted small mb-4">Добавление, удаление, смена пароля</p>
+
+    <!-- Уведомление об успехе -->
+    {% if success %}
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i>{{ success }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- Уведомление об ошибке -->
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+      <i class="bi bi-x-circle-fill me-2"></i>{{ error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <div class="row g-4">
+
+      <!-- ── Форма создания пользователя ── -->
+      <div class="col-12 col-md-5">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header fw-semibold text-white" style="background:#5a6268;">
+            <i class="bi bi-person-plus me-2"></i>Новый сотрудник
+          </div>
+          <div class="card-body p-4">
+            <form method="post" action="/admin/users/create" novalidate>
+
+              <div class="mb-3">
+                <label class="form-label fw-medium">Логин</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                  <input
+                    name="new_username"
+                    type="text"
+                    class="form-control"
+                    placeholder="Имя пользователя"
+                    required
+                    autofocus
+                  />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-medium">Пароль</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                  <input
+                    name="new_password"
+                    type="password"
+                    class="form-control"
+                    placeholder="Минимум 6 символов"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-medium">Роль</label>
+                <select name="new_role" class="form-select">
+                  <option value="employee" selected>Сотрудник</option>
+                  <option value="admin">Администратор</option>
+                </select>
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-gray fw-medium">
+                  <i class="bi bi-person-plus me-2"></i>Создать
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Таблица пользователей ── -->
+      <div class="col-12 col-md-7">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header fw-semibold text-white" style="background:#5a6268;">
+            <i class="bi bi-list-ul me-2"></i>Список пользователей
+            <span class="badge bg-light text-dark ms-2">{{ users | length }}</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-3">Логин</th>
+                    <th>Роль</th>
+                    <th class="text-end pe-3">Действия</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for user in users %}
+                  <tr>
+                    <td class="ps-3 fw-medium">
+                      <i class="bi bi-person-circle text-muted me-1"></i>
+                      {{ user.username }}
+                      {% if user.id == current_user_id %}
+                        <span class="badge bg-secondary ms-1 small">вы</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if user.role == "admin" %}
+                        <span class="badge bg-dark">Администратор</span>
+                      {% else %}
+                        <span class="badge" style="background:#adb5bd; color:#fff;">Сотрудник</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-end pe-3">
+                      <div class="d-flex justify-content-end gap-2">
+
+                        <!-- Кнопка смены пароля -->
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#pwdModal{{ user.id }}"
+                          title="Сменить пароль"
+                        >
+                          <i class="bi bi-key"></i>
+                        </button>
+
+                        <!-- Кнопка удаления (недоступна для себя) -->
+                        {% if user.id != current_user_id %}
+                        <form method="post" action="/admin/users/delete/{{ user.id }}"
+                              onsubmit="return confirm('Удалить пользователя «{{ user.username }}»?')">
+                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Удалить">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-sm btn-outline-danger" disabled title="Нельзя удалить себя">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                        {% endif %}
+
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Модальное окно смены пароля -->
+                  <div class="modal fade" id="pwdModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                      <div class="modal-content border-0 shadow">
+                        <div class="modal-header" style="background:#5a6268;">
+                          <h6 class="modal-title text-white">
+                            <i class="bi bi-key me-2"></i>Смена пароля — {{ user.username }}
+                          </h6>
+                          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="post" action="/admin/users/password/{{ user.id }}">
+                          <div class="modal-body">
+                            <label class="form-label fw-medium small">Новый пароль</label>
+                            <input
+                              name="new_password"
+                              type="password"
+                              class="form-control"
+                              placeholder="Минимум 6 символов"
+                              required
+                            />
+                          </div>
+                          <div class="modal-footer border-0 pt-0">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="submit" class="btn btn-sm btn-gray">Сохранить</button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /row -->
+  </div>
+</div>
+{% endblock %}

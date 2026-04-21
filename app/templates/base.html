@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Поиск бонусной карты{% endblock %}</title>
+  <title>{% block title %}Бонусные карты ECOO KZ{% endblock %}</title>
 
   <!-- Bootstrap 5 CDN -->
   <link
@@ -17,32 +17,53 @@
   />
   <link href="/static/style.css" rel="stylesheet" />
 </head>
-<body class="bg-light">
+<body>
 
   <!-- Навигационная панель (только для авторизованных) -->
   {% if username %}
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container">
-      <a class="navbar-brand fw-semibold" href="/search">
-        <i class="bi bi-credit-card-2-front me-2"></i>Бонусные карты
+      <a class="navbar-brand" href="/search">
+        <i class="bi bi-credit-card-2-front me-2"></i>Бонусные карты ECOO KZ
       </a>
-      <div class="d-flex align-items-center gap-2">
-        {% if role == "admin" %}
-        <a class="btn btn-outline-light btn-sm" href="/admin/upload">
-          <i class="bi bi-upload me-1"></i>Загрузка данных
-        </a>
-        {% endif %}
-        <span class="text-white-50 small">
-          <i class="bi bi-person-circle me-1"></i>{{ username }}
+
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Меню"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="ms-auto d-flex flex-wrap align-items-center gap-2 mt-2 mt-lg-0">
+
           {% if role == "admin" %}
-            <span class="badge bg-warning text-dark ms-1">Администратор</span>
-          {% else %}
-            <span class="badge bg-light text-primary ms-1">Сотрудник</span>
+          <a class="btn btn-outline-light btn-sm" href="/admin/users">
+            <i class="bi bi-people me-1"></i>Сотрудники
+          </a>
+          <a class="btn btn-outline-light btn-sm" href="/admin/upload">
+            <i class="bi bi-upload me-1"></i>Загрузка данных
+          </a>
           {% endif %}
-        </span>
-        <a class="btn btn-outline-light btn-sm" href="/logout">
-          <i class="bi bi-box-arrow-right me-1"></i>Выйти
-        </a>
+
+          <span class="text-white-50 small">
+            <i class="bi bi-person-circle me-1"></i>{{ username }}
+            {% if role == "admin" %}
+              <span class="badge bg-secondary ms-1">Администратор</span>
+            {% else %}
+              <span class="badge bg-secondary ms-1">Сотрудник</span>
+            {% endif %}
+          </span>
+
+          <a class="btn btn-outline-light btn-sm" href="/logout">
+            <i class="bi bi-box-arrow-right me-1"></i>Выйти
+          </a>
+        </div>
       </div>
     </div>
   </nav>

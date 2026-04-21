@@ -1,43 +1,133 @@
-/* ── Общие стили ─────────────────────────────────────────────────────────── */
+/* ── Цветовая палитра (серая тема) ───────────────────────────────────────── */
+:root {
+  --gray-50:  #f8f9fa;
+  --gray-100: #e9ecef;
+  --gray-200: #dee2e6;
+  --gray-400: #adb5bd;
+  --gray-500: #6c757d;
+  --gray-600: #5a6268;
+  --gray-700: #495057;
+  --gray-800: #343a40;
+  --gray-900: #212529;
+}
+
+/* ── Общие ───────────────────────────────────────────────────────────────── */
 body {
   min-height: 100vh;
   font-family: "Segoe UI", system-ui, sans-serif;
+  background-color: var(--gray-100);
+  color: var(--gray-900);
 }
 
-/* ── Карточки ────────────────────────────────────────────────────────────── */
-.card {
-  border-radius: 12px;
+/* ── Кастомная кнопка (серая) ────────────────────────────────────────────── */
+.btn-gray {
+  background-color: var(--gray-700);
+  border-color:     var(--gray-700);
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+.btn-gray:hover,
+.btn-gray:focus {
+  background-color: var(--gray-800);
+  border-color:     var(--gray-800);
+  color: #fff;
+}
+.btn-gray:active {
+  background-color: var(--gray-900);
+  border-color:     var(--gray-900);
+  color: #fff;
 }
 
-.card-header {
-  border-radius: 12px 12px 0 0 !important;
+/* Переопределяем Bootstrap primary → серый */
+.btn-primary {
+  background-color: var(--gray-700) !important;
+  border-color:     var(--gray-700) !important;
+  color: #fff !important;
+  letter-spacing: 0.02em;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: var(--gray-800) !important;
+  border-color:     var(--gray-800) !important;
 }
 
 /* ── Навбар ──────────────────────────────────────────────────────────────── */
 .navbar {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+  background-color: var(--gray-800) !important;
+  border-bottom: 2px solid var(--gray-900);
+}
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #fff !important;
+}
+.navbar .btn-outline-light {
+  border-color: var(--gray-400);
+  color: var(--gray-200);
+}
+.navbar .btn-outline-light:hover {
+  background-color: var(--gray-600);
+  border-color: var(--gray-400);
 }
 
-/* ── Кнопки ──────────────────────────────────────────────────────────────── */
-.btn-primary {
-  background-color: #2f302f;
-  border-color: #30343b;
-  letter-spacing: 0.02em;
+/* ── Карточки ────────────────────────────────────────────────────────────── */
+.card {
+  border-radius: 10px;
+  background-color: #fff;
+}
+.card-header {
+  border-radius: 10px 10px 0 0 !important;
+  background-color: var(--gray-700);
+  color: #fff;
+}
+.card-footer {
+  border-radius: 0 0 10px 10px !important;
+  background-color: var(--gray-50);
+  color: var(--gray-500);
 }
 
-/* ── Таблица результатов ─────────────────────────────────────────────────── */
+/* ── Таблица ─────────────────────────────────────────────────────────────── */
 .table th {
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #6c757d;
+  color: var(--gray-500);
+  background-color: var(--gray-50);
+}
+.table-hover tbody tr:hover {
+  background-color: var(--gray-100);
 }
 
 /* ── Иконка на странице логина ───────────────────────────────────────────── */
-.bi-credit-card-2-front-fill {
-  color: #0d6efd;
+.login-icon {
+  color: var(--gray-600);
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+.badge.bg-primary {
+  background-color: var(--gray-700) !important;
+}
+
+/* ── Поля ввода ──────────────────────────────────────────────────────────── */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--gray-500);
+  box-shadow: 0 0 0 0.2rem rgba(90,98,104,0.2);
+}
+.input-group-text {
+  background-color: var(--gray-100);
+  border-color: var(--gray-200);
+  color: var(--gray-600);
+}
+
+/* ── Alert success/warning ───────────────────────────────────────────────── */
+.alert-success {
+  background-color: #eaf2ea;
+  border-color: #c3e0c3;
+  color: #2d5a2d;
 }
 
 /* ── Адаптив ─────────────────────────────────────────────────────────────── */
